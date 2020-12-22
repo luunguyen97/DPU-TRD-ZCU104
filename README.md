@@ -111,7 +111,6 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
    CONFIG_packagegroup-petalinux-opencv
    CONFIG_packagegroup-petalinux-opencv-dev
     ```
-https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip
     *Packages for running Vitis-AI demo applications with GUI*
 
     ```
@@ -142,7 +141,24 @@ https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_
 4. Enable Package Management
     a) In rootfs config go to ***Image Features*** and enable ***package-management*** and ***debug_tweaks*** option </br>
     b) Click OK, Exit twice and select Yes to save the changes.
-
+5. Install Vitis AI Profiler 
+   These steps are _not_ required for Vitis AI prebuilt board images for ZCU102 & ZCU104   
+        a.	Configure and Build Petalinux:  
+        Run _petalinux-config -c kernel_ and Enable these for Linux kernel:
+          ```
+            General architecture-dependent options ---> [*] Kprobes
+            Kernel hacking  ---> [*] Tracers
+            Kernel hacking  ---> [*] Tracers  --->
+            			[*]   Kernel Function Tracer
+            			[*]   Enable kprobes-based dynamic events
+            			[*]   Enable uprobes-based dynamic events
+          ```
+        b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
+          ```
+            user-packages  --->  modules   --->
+          				[*]   packagegroup-petalinux-self-hosted
+          ```
+        c. Run _petalinux-build_ and update kernel and rootfs
 5. Update the Device tree.
    Since we will use the device tree which is automatically generated from Petalinux tool, we do not need to write device tree for dpu. Just leave ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi*** file like this
 ```
@@ -188,8 +204,25 @@ Change the name of the dfc generated file to ``dpux1_zcu104.dcf``
     "cpu_arch" : "arm64"
 }
 ```
-4. Download resnet50_tf model in this [link](https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip)
+4. Download resnet50_tf model in this [link](https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip). Extrac this file then we will have a folder name ``tf_resnetv1_50_imagenet_224_224_6.97G_1.2``
+5. Compile resnet50_tf model
+Run [resnet50_compile.sh](ref_file/resnet50_compile.sh):
+```
+#!/bin/sh
+TARGET=ZCU104
+NET_NAME=resnet50
+TF_NETWORK_PATH=./tf_resnetv1_50_imagenet_224_224_6.97G_1.2
 
+ARCH=/workspace/compile_custom_platform_ZCU104/hardware_platform/DPUx2_ZCU104_v1/zcu104_dpu.json
+
+vai_c_tensorflow --frozen_pb ${TF_NETWORK_PATH}/quantized/deploy_model.pb \
+                 --arch ${ARCH} \
+		 --output_dir ${TF_NETWORK_PATH}/vai_c_output_${TARGET}/ \
+		 --net_name ${NET_NAME} \
+		 --options "{'save_kernel':''}"
+```
+Take care of the ARCH variable. This variable should point to the ``zcu104_dpu.json`` file we created before. After runing this script, **dpu_resnet50_0.elf** will be generated. 
+6. Create ``Vitis-AI/VART/resnet50/model_zcu104`` folder and copy dpu_resnet50_0.elf file to it.
 
 **The TRD project has generated the matching model file in $TRD_HOME/app path as the default settings. If the user change the DPU settings. The model need to be created again.**
 
@@ -201,21 +234,14 @@ Copy the image.ub, boot.scr and BOOT.BIN files in **$TRD_HOME/prj/Vivado/dpu_pet
 
 Extract the rootfs.tar.gz files in **TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilinx-zcu104-2020.1/images/linux** to RootFs partition.
 
-Copy the folder **$TRD_HOME/app/** to RootFs partition
+Copy the folder **VART/sample/resnet50** to **RootFs/home/root** partition
 
 
 Reboot, after the linux boot, run in the RootFs partition:
 
 ```
-% cd /app
-
-% tar -xvf resnet50.tar.gz
-
-% cd samples/bin
-
-% cp ../../model/resnet50.elf .
-
-% env LD_LIBRARY_PATH=../lib ./resnet50 ../../img/bellpeppe-994958.JPEG
+% cd resnet50
+% ./resnet50 model_zcu104/dpu_resnet50_0.elf
 ```
 
 Expect:
