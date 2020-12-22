@@ -30,7 +30,7 @@ After the generation of bitstream completed.
 
   ![EXPORT HW](./doc/5.2.1-3.png)
   
-- In the Export Hardware window select "**Include bitstream**" and click "**OK**".
+- In the Export Hardware window select "**Fixed -> Include bitstream**" and click "**OK**".
 
   ![INCLUDE BIT](./doc/5.2.1-4.png)
 
@@ -52,23 +52,18 @@ source dpu_petalinux_bsp
 ```
 3. Create petalinux project from bsp:
 ```
-petalinux-create -t project -s xilinx-zcu102-trd.bsp -name xilinx-zcu104-trd
+petalinux-create -t project -s xilinx-zcu102-trd.bsp -n xilinx-zcu104-trd
 ```
 4. Import the hardware description with by giving the path of
 the directory containing the .xsa file as follows:
 ```
-cd xilinx-zcu104-2020.1
+cd xilinx-zcu104-trd
 petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/ 
 ```
-5. A petalinux-config menu would be launched, select ***DTG Settings->MACHINE_NAME***, modify it to ```zcu104-revc```. Select ***OK***
+5. A petalinux-config menu would be launched, select ***DTG Settings->MACHINE_NAME***, modify it to ***zcu104-revc***. Select ***OK***
 6. In ***DTG Settings-> uncheck "Remove PL from device tree"***. We will use the device tree which is automatically generated from Petalinux tool.
-7. Add EXT4 rootfs support
-   Since Vitis-AI software stack is not included in PetaLinux yet, they need to be installed after PetaLinux generates rootfs. PetaLinux uses initramfs format for rootfs by default, it can't retain the rootfs changes in run time. To make the root file system retain changes, we'll use EXT4 format for rootfs in second partition while keep the first partition FAT32 to store boot.bin file.
-
-   Run `petalinux-config`, go to ***Image Packaging Configuration***, select ***Root File System Type*** as ***EXT4***, and append `ext4` to ***Root File System Formats***. Exit and Save.
-
-   ![](./images/petalinux_image_packaging_configuration.png)
-
+7. In ***Firmware Version Configuration***, change Host name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***. Similarly Change Production name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***.
+8. In ***Yocto settings***, change YOCTO_MACHINE_NAME from ***zcu102-zynqmp*** to ***zcu104-zynqmp***
 ## Customize Root File System, Kernel, Device Tree and U-boot
 1. Add user packages by appending the CONFIG_x lines below to the ***<your_petalinux_project_dir>/project-spec/meta-user/conf/user-rootfsconfig*** file.
 
