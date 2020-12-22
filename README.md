@@ -223,7 +223,7 @@ Take care of the ARCH variable. This variable should point to the ``zcu104_dpu.j
 
 This part is about how to run the Resnet50 example from the source code.
 
-The user must create the SD card. Refer section "Configuring SD Card ext File System Boot" in page 65 of [ug1144]https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip(https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_1/ug1144-petalinux-tools-reference-guide.pdf)for Petalinux 2020.1:
+The user must create the SD card. Refer section "Configuring SD Card ext File System Boot" in page 65 of [ug1144](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_1/ug1144-petalinux-tools-reference-guide.pdf)for Petalinux 2020.1:
 
 Copy the image.ub, boot.scr and BOOT.BIN files in **$TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilinx-zcu104-2020.1/images/linux** to BOOT partition.
 
