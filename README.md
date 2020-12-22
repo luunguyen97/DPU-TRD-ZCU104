@@ -19,7 +19,8 @@ After executing the script, the Vivado IPI block design comes up as shown in the
 
 ![Block Design of DPU TRD Project](./doc/5.2.1-1.png)
 
-- Click on “**Generate Bitstream**”.
+- Create HDL Wrapper: Right click on **top.bd** under Design Source and choose **Create HDL Wrapper**
+- Then click on “**Generate Bitstream**”.
 
 ###### **Note:** If the user gets any pop-up with “**No implementation Results available**”. Click “**Yes**”. Then, if any pop-up comes up with “**Launch runs**”, Click "**OK**”.
 
@@ -43,10 +44,15 @@ This tutorial shows how to build the Linux image and boot image using the PetaLi
 ```bash
 source <path/to/petalinux-installer>/settings.sh
 ```
-2. Download ZCU104 board support package [xilinx-zcu104-v2020.1-final.bsp](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/embedded-design-tools/2020-1.html) and put it in **dpu_petalinux_bsp** folder
+2. We will use BSP of ZCU102 in the DPU-TRD tutorial to create Petalinux project for ZCU104. 
+Download ZCU102 board support package:
+```
+source dpu_petalinux_bsp
+./download_bsp.sh
+```
 3. Create petalinux project from bsp:
 ```
-petalinux-create -t project -s xilinx-zcu104-v2020.1-final.bsp
+petalinux-create -t project -s xilinx-zcu102-trd.bsp -name xilinx-zcu104-trd
 ```
 4. Import the hardware description with by giving the path of
 the directory containing the .xsa file as follows:
@@ -54,30 +60,14 @@ the directory containing the .xsa file as follows:
 cd xilinx-zcu104-2020.1
 petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/ 
 ```
-5. A petalinux-config menu would be launched, select ***DTG Settings->MACHINE_NAME***, modify it to ```zcu104-revc```. Select ***OK -> Exit*** 
-6. Add EXT4 rootfs support
-
+5. A petalinux-config menu would be launched, select ***DTG Settings->MACHINE_NAME***, modify it to ```zcu104-revc```. Select ***OK***
+6. In ***DTG Settings-> uncheck "Remove PL from device tree"***. We will use the device tree which is automatically generated from Petalinux tool.
+7. Add EXT4 rootfs support
    Since Vitis-AI software stack is not included in PetaLinux yet, they need to be installed after PetaLinux generates rootfs. PetaLinux uses initramfs format for rootfs by default, it can't retain the rootfs changes in run time. To make the root file system retain changes, we'll use EXT4 format for rootfs in second partition while keep the first partition FAT32 to store boot.bin file.
 
    Run `petalinux-config`, go to ***Image Packaging Configuration***, select ***Root File System Type*** as ***EXT4***, and append `ext4` to ***Root File System Formats***. Exit and Save.
 
    ![](./images/petalinux_image_packaging_configuration.png)
-
-   Update ***bootargs*** to allow Linux to boot from EXT4 partition. There are various ways to update bootargs. Please take either way below.
-   
-   - Run `petalinux-config`
-   - Change ***DTG settings -> Kernel Bootargs -> generate boot args automatically*** to NO and update ***User Set Kernel Bootargs*** to `earlycon console=ttyPS0,115200 clk_ignore_unused root=/dev/mmcblk0p2 rw rootwait cma=512M`. Click OK
-   - Update in  ***system-user.dtsi***: add `chosen` node in root in addition to the previous changes to this file.
-   ```
-   /include/ "system-conf.dtsi"
-   / {
-	   chosen {
-	   	bootargs = "earlycon console=ttyPS0,115200 clk_ignore_unused root=/dev/mmcblk0p2 rw rootwait cma=512M";
-	   };
-   };
-   ```
-   - Remove ***Devicetree flags*** from @ to blank
-   - Enable ***Remove PL from device tree***. Click OK, Exit and Save.
 
 ## Customize Root File System, Kernel, Device Tree and U-boot
 1. Add user packages by appending the CONFIG_x lines below to the ***<your_petalinux_project_dir>/project-spec/meta-user/conf/user-rootfsconfig*** file.
@@ -121,7 +111,7 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
    CONFIG_packagegroup-petalinux-opencv
    CONFIG_packagegroup-petalinux-opencv-dev
     ```
-
+https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip
     *Packages for running Vitis-AI demo applications with GUI*
 
     ```
@@ -154,46 +144,12 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
     b) Click OK, Exit twice and select Yes to save the changes.
 
 5. Update the Device tree.
-
-   Append the following contents to the ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi*** file.
-
-   - ***zyxclmm_drm*** node is required by zocl driver, which is a part of Xilinx Runtime for Vitis acceleration flow.
-   - ***axi_intc_0*** node overrides interrupt inputs numbers from 0 to 32. Since there was nothing connected to the interrupt controller in the hardware design, it cannot be inferred in advance. 
-   - ***sdhci1*** node decreases SD Card speed for better card compatibility on ZCU104 board. This only relates to ZCU104. It's not a part of Vitis acceleration platform requirements.
-
-   ***Note***: an example file is provided in ***ref_files/system-user.dtsi***.
-
-   ```
-   &amba {
-       zyxclmm_drm {
-           compatible = "xlnx,zocl";
-           status = "okay";
-           interrupt-parent = <&axi_intc_0>;
-           interrupts = <0  4>, <1  4>, <2  4>, <3  4>,
-                    <4  4>, <5  4>, <6  4>, <7  4>,
-                    <8  4>, <9  4>, <10 4>, <11 4>,
-                    <12 4>, <13 4>, <14 4>, <15 4>,
-                    <16 4>, <17 4>, <18 4>, <19 4>,
-                    <20 4>, <21 4>, <22 4>, <23 4>,
-                    <24 4>, <25 4>, <26 4>, <27 4>,
-                    <28 4>, <29 4>, <30 4>, <31 4>;
-       };
-   };
-   
-   &axi_intc_0 {
-         xlnx,kind-of-intr = <0x0>;
-         xlnx,num-intr-inputs = <0x20>;
-         interrupt-parent = <&gic>;
-         interrupts = <0 89 4>;
-   };
-   
-   &sdhci1 {
-         no-1-8-v;
-         disable-wp;
-   };
-   
-   ```
-   
+   Since we will use the device tree which is automatically generated from Petalinux tool, we do not need to write device tree for dpu. Just leave ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi*** file like this
+```
+/include/ "system-conf.dtsi"
+/ {
+};
+```
 Build petalinux project. This step may take some hours to finish.
 ```
 petalinux-build
@@ -201,15 +157,45 @@ petalinux-build
 Create a boot image (BOOT.BIN) including FSBL, ATF, bitstream, and u-boot:
 ```
 cd images/linux
-petalinux-package --boot --fsbl zynqmp_fsbl.elf --u-boot u-boot.elf --pmufw pmufw.elf --fpga system.bit
+petalinux-package --boot --fsbl zynqmp_fsbl.elf --u-boot u-boot.elf --pmufw pmufw.elf --fpga system.bithttps://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip
 ```
-## 3. Test platform with Resnet50 Example 
+## 3. Test platform with VART Resnet50 Example 
+1. Get HWH file
+HWH file is an important file that needed by the VAI_C tool. The file has been created when compile by the Vivado tool. It works together with VAI_C to support model compilation under various DPU configurations.
+We can get the HWH file in the following path.
+$VIVADO_PRJ/srcs/top/hw_handoff/top.hwh
+2. Generate DPU configuration file DCF with Dlet tool
+DLet: DLet is host tool designed to parse and extract various edge DPU configuration
+parameters from DPU hardware handoff file HWH, generated by Vivado
+```
+./docker_run.sh xilinx/vitis-ai-gpu:latest
+```
+Genetate DPU configuration file DCF with Dlet
+```
+dlet -f /path/to/hwh/file/
+```
+Running command dlet -f <bd_name>.hwh, DLet outputs the DPU configuration file
+DCF, named in the format of dpu-dd-mm-yyyy-hh-mm.dcf. dd-mm-yyyy-hh-mm is the
+timestamp of when the DPU HWH is created. With the specified DCF file, VAI_C compiler
+automatically produces DPU code instructions suited for the DPU configuration parameters.
+We need to use vitis AI docker to using Dlet.
+Change the name of the dfc generated file to ``dpux1_zcu104.dcf``
+3. Create ``zcu104_dpu.json`` file. Below is an example of this file:
+```
+{
+    "target"   : "DPUCZDX8G",
+    "dcf"      : "/workspace/compile_custom_platform_ZCU104/hardware_platform/DPUx2_ZCU104_v1/zcu104_dpu.dcf",
+    "cpu_arch" : "arm64"
+}
+```
+4. Download resnet50_tf model in this [link](https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip)
+
 
 **The TRD project has generated the matching model file in $TRD_HOME/app path as the default settings. If the user change the DPU settings. The model need to be created again.**
 
 This part is about how to run the Resnet50 example from the source code.
 
-The user must create the SD card. Refer section "Configuring SD Card ext File System Boot" in page 65 of [ug1144](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_1/ug1144-petalinux-tools-reference-guide.pdf)for Petalinux 2020.1:
+The user must create the SD card. Refer section "Configuring SD Card ext File System Boot" in page 65 of [ug1144]https://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip(https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_1/ug1144-petalinux-tools-reference-guide.pdf)for Petalinux 2020.1:
 
 Copy the image.ub, boot.scr and BOOT.BIN files in **$TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilinx-zcu104-2020.1/images/linux** to BOOT partition.
 
