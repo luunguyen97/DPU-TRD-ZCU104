@@ -142,12 +142,15 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
         Run _petalinux-config -c kernel_ and Enable these for Linux kernel:
           ```
             General architecture-dependent options ---> [*] Kprobes
+	    
             Kernel hacking  ---> [*] Tracers
+	    
             Kernel hacking  ---> [*] Tracers  --->
             			[*]   Kernel Function Tracer
             			[*]   Enable kprobes-based dynamic events
             			[*]   Enable uprobes-based dynamic events
           ```
+	  
         b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
           ```
             user-packages  --->  modules   --->
