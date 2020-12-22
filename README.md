@@ -137,26 +137,24 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
     a) In rootfs config go to ***Image Features*** and enable ***package-management*** and ***debug_tweaks*** option </br>
     b) Click OK, Exit twice and select Yes to save the changes.
 5. Install Vitis AI Profiler 
-   These steps are _not_ required for Vitis AI prebuilt board images for ZCU102 & ZCU104   
-        a.	Configure and Build Petalinux:  
-        Run _petalinux-config -c kernel_ and Enable these for Linux kernel:
-          ```
-            General architecture-dependent options ---> [*] Kprobes
-	    
+These steps are _not_ required for Vitis AI prebuilt board images for ZCU102 & ZCU104   
+a. Configure and Build Petalinux:  
+Run _petalinux-config -c kernel_ and Enable these for Linux kernel:
+ ```
+            General architecture-dependent options ---> [*] Kprobes    
             Kernel hacking  ---> [*] Tracers
-	    
             Kernel hacking  ---> [*] Tracers  --->
-            			[*]   Kernel Function Tracer
-            			[*]   Enable kprobes-based dynamic events
-            			[*]   Enable uprobes-based dynamic events
-          ```
-	  
-        b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
-          ```
+            			 [*]   Kernel Function Tracer
+            			 [*]   Enable kprobes-based dynamic events
+            			 [*]   Enable uprobes-based dynamic events
+```
+      
+b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
+```
             user-packages  --->  modules   --->
-          				[*]   packagegroup-petalinux-self-hosted
-          ```
-        c. Run _petalinux-build_ and update kernel and rootfs
+          			[*]   packagegroup-petalinux-self-hosted
+```
+c. Run _petalinux-build_ and update kernel and rootfs
 5. Update the Device tree.
    Since we will use the device tree which is automatically generated from Petalinux tool, we do not need to write device tree for dpu. Just leave ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi*** file like this
 ```
