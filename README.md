@@ -20,6 +20,7 @@ After executing the script, the Vivado IPI block design comes up as shown in the
 ![Block Design of DPU TRD Project](./doc/5.2.1-1.png)
 
 - Create HDL Wrapper: Right click on **top.bd** under Design Source and choose **Create HDL Wrapper**
+- Change implamentation strategy from ***Default*** to ***Performance_ExplorePostRoutPhysOpt***
 - Then click on “**Generate Bitstream**”.
 
 ###### **Note:** If the user gets any pop-up with “**No implementation Results available**”. Click “**Yes**”. Then, if any pop-up comes up with “**Launch runs**”, Click "**OK**”.
@@ -61,9 +62,8 @@ cd xilinx-zcu104-trd
 petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/ 
 ```
 5. A petalinux-config menu would be launched, select ***DTG Settings->MACHINE_NAME***, modify it to ***zcu104-revc***. Select ***OK***
-6. In ***DTG Settings-> uncheck "Remove PL from device tree"***. We will use the device tree which is automatically generated from Petalinux tool.
-7. In ***Firmware Version Configuration***, change Host name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***. Similarly Change Production name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***.
-8. In ***Yocto settings***, change YOCTO_MACHINE_NAME from ***zcu102-zynqmp*** to ***zcu104-zynqmp***
+6. In ***Firmware Version Configuration***, change Host name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***. Similarly Change Production name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***.
+7. In ***Yocto settings***, change YOCTO_MACHINE_NAME from ***zcu102-zynqmp*** to ***zcu104-zynqmp***
 ## Customize Root File System, Kernel, Device Tree and U-boot
 1. Add user packages by appending the CONFIG_x lines below to the ***<your_petalinux_project_dir>/project-spec/meta-user/conf/user-rootfsconfig*** file.
 
@@ -131,12 +131,19 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
     d) Go to ***Filesystem Packages-> misc->packagegroup-core-ssh-dropbear*** and disable ***packagegroup-core-ssh-dropbear***. Go to ***Filesystem Packages*** level by Exit twice.
 
     e) Go to ***console  -> network -> openssh*** and enable ***openssh***, ***openssh-sftp-server***, ***openssh-sshd***, ***openssh-scp***. Go to root level by Exit four times.
-    g) Enable options specified in this file [rootfs_config.md](./config/rootfs-config.md).
     
 4. Enable Package Management
     a) In rootfs config go to ***Image Features*** and enable ***package-management*** and ***debug_tweaks*** option </br>
     b) Click OK, Exit twice and select Yes to save the changes.
-5. Install Vitis AI Profiler 
+5. Disable CPU IDLE in kernel config (Optional)
+   *CPU IDLE would cause CPU IDLE when JTAG is connected. So it is recommended to disable the selection during project development phase. It can be enabled for production to save power.*
+   a) Type ```petalinux-config -c kernel```
+   b) Ensure the following items are ***TURNED OFF*** by entering 'n' in the [ ] menu selection:
+
+   - ***CPU Power Mangement > CPU Idle > CPU idle PM support***
+   - ***CPU Power Management > CPU Frequency scaling > CPU Frequency scaling***
+   c) Exit and Save.
+6. Install Vitis AI Profiler 
 These steps are _not_ required for Vitis AI prebuilt board images for ZCU102 & ZCU104   
 a. Configure and Build Petalinux:  
 Run _petalinux-config -c kernel_ and Enable these for Linux kernel:
@@ -155,13 +162,9 @@ b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
           			[*]   packagegroup-petalinux-self-hosted
 ```
 c. Run _petalinux-build_ and update kernel and rootfs
-5. Update the Device tree.
-   Since we will use the device tree which is automatically generated from Petalinux tool, we do not need to write device tree for dpu. Just leave ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi*** file like this
-```
-/include/ "system-conf.dtsi"
-/ {
-};
-```
+7. Update the Device tree.
+   Look at the **Address Editor** on Vivado project to see the base-addr of DPU and change its value in  ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi***. An example of ***system-user.dtsi*** with DPU base-addr = 0x80000000 is shown at [here](ref_files/system-user.dtsi).
+
 Build petalinux project. This step may take some hours to finish.
 ```
 petalinux-build
@@ -169,7 +172,7 @@ petalinux-build
 Create a boot image (BOOT.BIN) including FSBL, ATF, bitstream, and u-boot:
 ```
 cd images/linux
-petalinux-package --boot --fsbl zynqmp_fsbl.elf --u-boot u-boot.elf --pmufw pmufw.elf --fpga system.bithttps://www.xilinx.com/bin/public/openDownload?filename=tf_resnetv1_50_imagenet_224_224_6.97G_1.2.zip
+petalinux-package --boot --fsbl zynqmp_fsbl.elf --u-boot u-boot.elf --pmufw pmufw.elf --fpga system.bit
 ```
 ## 3. Test platform with VART Resnet50 Example 
 1. Get HWH file
