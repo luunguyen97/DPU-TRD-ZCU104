@@ -162,6 +162,7 @@ b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
           			[*]   packagegroup-petalinux-self-hosted
 ```
 c. Run _petalinux-build_ and update kernel and rootfs
+
 7. Update the Device tree.
    Look at the **Address Editor** on Vivado project to see the base-addr of DPU and change its value in  ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi***. An example of ***system-user.dtsi*** with DPU base-addr = 0x80000000 is shown at [here](ref_files/system-user.dtsi).
 
