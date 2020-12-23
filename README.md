@@ -15,6 +15,7 @@ On Tcl conslole in Vivado, run this command to create hardware platform with 1 c
 ```bash 
 source script/dpux1_zcu104.tcl
 ```
+For platform with 2 DPU cores, you can use this tcl [dpux2_zcu104.tcl](Vivado/prj/scripts/dpux2_zcu104.tcl).
 After executing the script, the Vivado IPI block design comes up as shown in the below figure.
 
 ![Block Design of DPU TRD Project](./doc/5.2.1-1.png)
