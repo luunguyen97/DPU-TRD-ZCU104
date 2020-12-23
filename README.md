@@ -11,7 +11,7 @@ Create normal project with ZCU104 board
 Add dpu_ip repository. Go to **IP Catalog**. Right click on **Vivado Repository**. Choose **Add Repository**. Choose **dpu_ip** folder.
 Note:The default settings of DPU is B4096 with RAM_USAGE_LOW, CHANNEL_AUGMENTATION_ENABLE, DWCV_ENABLE, POOL_AVG_ENABLE, RELU_LEAKYRELU_RELU6, Softmax. 
 Modify the DPU block in Vivado design to change these default settings. 
-On Tcl conslole in Vivado, run this command to create hardware platform with 1 core DPU on ZCU104 board:
+On Tcl conslole in Vivado, run this command to create hardware platform with 1 core DPU from tcl file [dpux1_zcu104.tcl](prj/Vivado/scripts/dpux1_zcu104.tcl).
 ```bash 
 source script/dpux1_zcu104.tcl
 ```
