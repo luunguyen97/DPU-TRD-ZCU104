@@ -65,7 +65,7 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
 6. In ***Firmware Version Configuration***, change Host name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***. Similarly Change Production name from ***xilinx-zcu102-2020_1*** to ***xilinx-zcu104-2020_1***.
 7. In ***Yocto settings***, change YOCTO_MACHINE_NAME from ***zcu102-zynqmp*** to ***zcu104-zynqmp***
 ## Customize Root File System, Kernel, Device Tree and U-boot
-1. Add user packages by appending the CONFIG_x lines below to the ***<your_petalinux_project_dir>/project-spec/meta-user/conf/user-rootfsconfig*** file.
+1. Add user packages by appending the CONFIG_x lines below to the ***<your_petalinux_project_dir>/project-spec/meta-user/conf/user-rootfsconfig*** file. You can just copy this [user-rootfsconfig](ref_files/user-rootfsconfig).
 
    ***Note: This step is not a must but it makes it easier to find and select all required packages in next step. If this step is skipped, please enable the required packages in next step.***
 
