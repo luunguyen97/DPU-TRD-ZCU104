@@ -226,7 +226,8 @@ vai_c_tensorflow --frozen_pb ${TF_NETWORK_PATH}/quantized/deploy_model.pb \
 		 --options "{'save_kernel':''}"
 ```
 Take care of the ARCH variable. This variable should point to the ``zcu104_dpu.json`` file we created before. After runing this script, **dpu_resnet50_0.elf** will be generated. 
-6. Create ``Vitis-AI/VART/resnet50/model_zcu104`` folder and copy dpu_resnet50_0.elf file to it.
+
+6. Create ``Vitis-AI/VART/sample/resnet50/model_zcu104`` folder and copy dpu_resnet50_0.elf file to it.
 
 **The TRD project has generated the matching model file in $TRD_HOME/app path as the default settings. If the user change the DPU settings. The model need to be created again.**
 
@@ -235,10 +236,32 @@ This part is about how to run the Resnet50 example from the source code.
 The user must create the SD card. Refer section "Configuring SD Card ext File System Boot" in page 65 of [ug1144](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_1/ug1144-petalinux-tools-reference-guide.pdf)for Petalinux 2020.1:
 
 Copy the image.ub, boot.scr and BOOT.BIN files in **$TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilinx-zcu104-2020.1/images/linux** to BOOT partition.
-
+```
+cp images/linux/BOOT.BIN /media/BOOT/
+cp images/linux/image.ub /media/BOOT/
+cp images/linux/boot.scr /media/BOOT/
+```
 Extract the rootfs.tar.gz files in **TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilinx-zcu104-2020.1/images/linux** to RootFs partition.
-
+```
+sudo tar xvf rootfs.tar.gz -C /media/rootfs
+```
 Copy the folder **VART/sample/resnet50** to **RootFs/home/root** partition
+
+7. Install Vitis AI Runtime on the target board	
+	* Download the [Vitis AI Runtime 1.2.1](https://www.xilinx.com/bin/public/openDownload?filename=vitis-ai-runtime-1.2.1.tar.gz).  	
+	* Untar the runtime packet and copy the following folder to the board using scp.
+	```
+	$tar -xzvf vitis-ai-runtime-1.2.1.tar.gz
+	$scp -r vitis-ai-runtime-1.2.1/aarch64/centos root@IP_OF_BOARD:~/
+	```
+	* Install the Vitis AI Runtime on target board. Execute the following command in order.
+	```
+	#cd ~/centos
+	#rpm -ivh --force libunilog-1.2.0-r<x>.aarch64.rpm
+	#rpm -ivh --force libxir-1.2.0-r<x>.aarch64.rpm
+	#rpm -ivh --force libtarget-factory-1.2.0-r<x>.aarch64.rpm
+	#rpm -ivh --force libvart-1.2.0-r<x>.aarch64.rpm
+	```
 
 
 Reboot, after the linux boot, run in the RootFs partition:
