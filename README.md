@@ -1,4 +1,4 @@
-# DPU-TRD-for-ZCU104-on-Vivado-2020.1-and-Petalinux-2020.1
+# DPU-TRD-for-ZCU104
 Create DPU hardware platform on Vivado 2020.1 and create boot image by Petalinux 2020.1
 Based on [DPU-TRD-Vivado-flow](https://github.com/Xilinx/Vitis-AI/tree/master/DPU-TRD/prj/Vivado) in Vitis-AI 1.2 version and [Vitis Custom Embedded Platform Creation Example on ZCU104](https://github.com/Xilinx/Vitis-Tutorials/blob/master/Vitis_Platform_Creation/Introduction/02-Edge-AI-ZCU104/README.md)
 ## 1. Create DPU hardware platform on Vivado 2020.1
