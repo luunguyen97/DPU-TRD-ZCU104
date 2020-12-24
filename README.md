@@ -229,10 +229,7 @@ Take care of the ARCH variable. This variable should point to the ``zcu104_dpu.j
 
 6. Create ``Vitis-AI/VART/sample/resnet50/model_zcu104`` folder and copy dpu_resnet50_0.elf file to it.
 
-**The TRD project has generated the matching model file in $TRD_HOME/app path as the default settings. If the user change the DPU settings. The model need to be created again.**
-
-This part is about how to run the Resnet50 example from the source code.
-
+7. Prepare SD card
 The user must create the SD card. Refer section "Configuring SD Card ext File System Boot" in page 65 of [ug1144](https://www.xilinx.com/support/documentation/sw_manuals/xilinx2020_1/ug1144-petalinux-tools-reference-guide.pdf)for Petalinux 2020.1:
 
 Copy the image.ub, boot.scr and BOOT.BIN files in **$TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilinx-zcu104-2020.1/images/linux** to BOOT partition.
@@ -246,6 +243,9 @@ Extract the rootfs.tar.gz files in **TRD_HOME/prj/Vivado/dpu_petalinux_bsp/xilin
 sudo tar xvf rootfs.tar.gz -C /media/rootfs
 ```
 Copy the folder **VART/sample/resnet50** to **RootFs/home/root** partition
+```
+sudo cp -r Vitis-AI/VART/sample/resnet50 /media/RootFs/home/root
+```
 
 7. Install Vitis AI Runtime on the target board	
 	* Download the [Vitis AI Runtime 1.2.1](https://www.xilinx.com/bin/public/openDownload?filename=vitis-ai-runtime-1.2.1.tar.gz).  	
