@@ -165,7 +165,27 @@ b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
 ```
 c. Run _petalinux-build_ and update kernel and rootfs
 
-7. Update the Device tree.
+7. Enable libv4l, libav for video processing
+   a) create a bbappend file as show below:
+   ```
+   $ mkdir -p <plnx-proj-root>/project-spec/meta-user/recipes-support/opencv
+   $ vim <plnx-proj-root>/project-spec/meta-user/recipes-support/opencv/opencv_%.bbappend
+
+   # opencv_%.bbappend
+   PACKAGECONFIG_append = "libv4l libav"
+   ```
+   b) Enable gstreamer packagegroup:
+   ```
+   petalinux-config -c rootfs ---> Petalinux Package Groups ---> packagegroup-petalinux-gstreamer ---> [*] packagegroup-petalinux-gstreamer
+   ```
+   c) Enable the GStreamer1.0-libav package and whitelist the license flag:
+   ```
+   gedit <plnx-proj-root>/project-spec/meta-user/conf/petalinuxbsp.conf
+   
+   IMAGE_INSTALL_append = " gstreamer1.0-libav"
+   LICENSE_FLAGS_WHITELIST_append = " commercial_gstreamer1.0-libav"
+   ```
+9. Update the Device tree.
    Look at the **Address Editor** on Vivado project to see the base-addr of DPU and change its value in  ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi***. An example of ***system-user.dtsi*** with DPU base-addr = 0x80000000 is shown at [here](ref_files/system-user.dtsi).
 
 Build petalinux project. This step may take some hours to finish.
