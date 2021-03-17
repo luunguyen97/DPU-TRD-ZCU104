@@ -165,7 +165,7 @@ b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
 ```
 
 7. Enable libv4l, libav for video processing
-   a) create a bbappend file as show below:
+a) create a bbappend file as show below:
    ```
    $ mkdir -p <plnx-proj-root>/project-spec/meta-user/recipes-support/opencv
    $ vim <plnx-proj-root>/project-spec/meta-user/recipes-support/opencv/opencv_%.bbappend
@@ -173,11 +173,11 @@ b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
    # opencv_%.bbappend
    PACKAGECONFIG_append = "libv4l libav"
    ```
-   b) Enable gstreamer packagegroup:
+b) Enable gstreamer packagegroup:
    ```
    petalinux-config -c rootfs ---> Petalinux Package Groups ---> packagegroup-petalinux-gstreamer ---> [*] packagegroup-petalinux-gstreamer
    ```
-   c) Enable the GStreamer1.0-libav package and whitelist the license flag:
+c) Enable the GStreamer1.0-libav package and whitelist the license flag:
    ```
    gedit <plnx-proj-root>/project-spec/meta-user/conf/petalinuxbsp.conf
    
