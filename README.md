@@ -145,7 +145,7 @@ petalinux-config --get-hw-description=$TRD_HOME/prj/Vivado/prj/
    - ***CPU Power Mangement > CPU Idle > CPU idle PM support***
    - ***CPU Power Management > CPU Frequency scaling > CPU Frequency scaling***
    c) Exit and Save.
-6. Install Vitis AI Profiler 
+6. Install Vitis AI Profiler (Only available in Vitis flow => not use in Vivado flow)
 These steps are _not_ required for Vitis AI prebuilt board images for ZCU102 & ZCU104   
 a. Configure and Build Petalinux:  
 Run _petalinux-config -c kernel_ and Enable these for Linux kernel:
@@ -163,7 +163,6 @@ b. Run _petelinux-config -c rootfs_ and enable this for root-fs:
             user-packages  --->  modules   --->
           			[*]   packagegroup-petalinux-self-hosted
 ```
-c. Run _petalinux-build_ and update kernel and rootfs
 
 7. Enable libv4l, libav for video processing
    a) create a bbappend file as show below:
