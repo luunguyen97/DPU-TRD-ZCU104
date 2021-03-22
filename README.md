@@ -23,7 +23,7 @@ After executing the script, the Vivado IPI block design comes up as shown in the
 
 - Create HDL Wrapper: Right click on **top.bd** under Design Source and choose **Create HDL Wrapper**, select **Let Vivado manage wrapper and auto-update**. Click **OK**.
 - Generate pre-synth design: Select **Generate Block Design** from Flow Navigator. Select **Synthesis Options** to **Global**, it will skip IP synthesis during generation. Click **Generate**.
-- Change implamentation strategy from ***Default*** to ***Performance_ExplorePostRoutPhysOpt***. In ***Post-Route Phys Opt Design***, expand ***-directive*** option and choose ***AggressiveExplore***. The timing issue happened when using Default implementation strategy.
+- Change implamentation strategy from ***Default*** to ***Performance_ExplorePostRoutPhysOpt*** strategy. Navigate to ***Post-Route Phys Opt Design***, expand ***-directive*** option and choose ***AggressiveExplore***. The timing issue happened when using Default implementation strategy.
 - Then click on “**Generate Bitstream**”.
 
 ###### **Note:** If the user gets any pop-up with “**No implementation Results available**”. Click “**Yes**”. Then, if any pop-up comes up with “**Launch runs**”, Click "**OK**”.
