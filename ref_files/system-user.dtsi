@@ -1,21 +1,19 @@
 /include/ "system-conf.dtsi"
 /{
-    dpu: dpu@80000000 {
+    dpu: dpu@8f000000 {
          compatible = "deephi, dpu";
          reg = <0x0 0x80000000 0x0 0x700>;
-         interrupts = <0x0 106 0x1 0x0 107 0x1 0x0 108 0x1 0x0 109 0x1>;
+         interrupts = <0x0 106 0x4>;
          interrupt-parent = <&gic>;
-         core-num = <0x4>;
-
-         softmax@800001000 {
-            compatible = "deephi,smfc";
-            interrupt-parent = <&gic>;
-            interrupts = <0x0 0x6e 0x1>;
-            core-num = <0x1>;
-        };
+         core-num = <0x1>;
      };
      dpcma: dpcma {
          compatible = "deephi,cma";
      };
 
+};
+
+&sdhci1 {
+      no-1-8-v;
+      disable-wp;
 };
