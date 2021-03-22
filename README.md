@@ -10,7 +10,7 @@ vivado
 Create normal project with ZCU104 board
 Add dpu_ip repository. Go to **IP Catalog**. Right click on **Vivado Repository**. Choose **Add Repository**. Choose **dpu_ip** folder.
 
-Note:The default settings of DPU is B4096 with RAM_USAGE_LOW, CHANNEL_AUGMENTATION_ENABLE, DWCV_ENABLE, POOL_AVG_ENABLE, RELU_LEAKYRELU_RELU6, Softmax. Modify the DPU block in Vivado design to change these default settings. The BRAM resources on ZCU104 is much lower than ZCU102, so we need to use both BRAM and URAM for DPU. In this project, the ``Ultra-RAM Use per DPU`` DPU IP is set at 20 for 1 DPU core, and 40 for 2 DPU cores. 
+Note:The default settings of DPU is B4096 with RAM_USAGE_LOW, CHANNEL_AUGMENTATION_ENABLE, DWCV_ENABLE, POOL_AVG_ENABLE, RELU_LEAKYRELU_RELU6, Softmax. Modify the DPU block in Vivado design to change these default settings. The BRAM resources on ZCU104 is much lower than ZCU102, so we need to use both BRAM and URAM for DPU. In this project, the ``Ultra-RAM Use per DPU`` DPU IP is set at 30 for 1 DPU core, and 40 for 2 DPU cores. 
  
 On Tcl conslole in Vivado, run this command to create hardware platform with 1 core DPU from tcl file [dpux1_zcu104.tcl](prj/Vivado/scripts/dpux1_zcu104.tcl).
 ```bash 
@@ -21,7 +21,8 @@ After executing the script, the Vivado IPI block design comes up as shown in the
 
 ![Block Design of DPU TRD Project](./doc/5.2.1-1.png)
 
-- Create HDL Wrapper: Right click on **top.bd** under Design Source and choose **Create HDL Wrapper**
+- Create HDL Wrapper: Right click on **top.bd** under Design Source and choose **Create HDL Wrapper**, select **Let Vivado manage wrapper and auto-update**. Click **OK**.
+- Generate pre-synth design: Select **Generate Block Design** from Flow Navigator. Select **Synthesis Options** to **Global**, it will skip IP synthesis during generation. Click **Generate**.
 - Change implamentation strategy from ***Default*** to ***Performance_ExplorePostRoutPhysOpt***. The timing issue happened when using Default implementation strategy.
 - Then click on “**Generate Bitstream**”.
 
