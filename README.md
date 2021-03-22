@@ -184,7 +184,7 @@ c. Enable the GStreamer1.0-libav package and whitelist the license flag:
    LICENSE_FLAGS_WHITELIST_append = " commercial_gstreamer1.0-libav"
    ```
 9. Update the Device tree.
-   Look at the **Address Editor** on Vivado project to see the base-addr of DPU and change its value in  ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi***. An example of ***system-user.dtsi*** with DPU base-addr = 0x80000000 is shown at [here](ref_files/system-user.dtsi).
+   Look at the **Address Editor** on Vivado project to see the base-addr of DPU and change its value in  ***project-spec/meta-user/recipes-bsp/device-tree/files/system-user.dtsi***. An example of ***system-user.dtsi*** with 1 core DPU and DPU base-addr = 0x80000000 is shown at [here](ref_files/system-user.dtsi). Note that you need to change base-addr, interrupts, core-num parameters correctly based on your custom Vivado hardfware
 
 Build petalinux project. This step may take some hours to finish.
 ```
